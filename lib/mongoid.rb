@@ -19,30 +19,27 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+require "rubygems"
+
+gem "activesupport", ">= 2.2.2", "<3.0.pre"
+gem "mongo", "~>1.0.1"
+gem "bson", "~>1.0.1"
+gem "durran-validatable", ">= 2.0.1"
+gem "will_paginate", ">= 2.3.11", "< 2.9"
 
 require "delegate"
 require "singleton"
 require "time"
-require "ostruct"
+require "validatable"
+require "active_support/callbacks"
 require "active_support/core_ext"
-require 'active_support/json'
 require "active_support/inflector"
 require "active_support/time_with_zone"
-require "active_model"
-require "active_model/callbacks"
-require "active_model/conversion"
-require "active_model/deprecated_error_methods"
-require "active_model/errors"
-require "active_model/naming"
-require "active_model/serialization"
-require "active_model/translation"
-require "active_model/validator"
-require "active_model/validations"
 require "will_paginate/collection"
 require "mongo"
+require "mongoid/concern"
 require "mongoid/observable"
 require "mongoid/associations"
-require "mongoid/atomicity"
 require "mongoid/attributes"
 require "mongoid/callbacks"
 require "mongoid/collection"
@@ -60,7 +57,6 @@ require "mongoid/factory"
 require "mongoid/field"
 require "mongoid/fields"
 require "mongoid/finders"
-require "mongoid/hierarchy"
 require "mongoid/identity"
 require "mongoid/indexes"
 require "mongoid/javascript"
@@ -72,16 +68,9 @@ require "mongoid/persistence"
 require "mongoid/scope"
 require "mongoid/state"
 require "mongoid/timestamps"
-require "mongoid/validations"
 require "mongoid/versioning"
 require "mongoid/components"
-require "mongoid/paranoia"
 require "mongoid/document"
-
-# add railtie
-if defined?(Rails)
-  require "mongoid/railtie"
-end
 
 module Mongoid #:nodoc
 

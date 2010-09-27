@@ -19,15 +19,6 @@ module Mongoid #:nodoc
       def extends(options)
         extend Module.new(&options.extension) if options.extension?
       end
-
-      # Sets up the parent, klass, foreign_key, options
-      def setup(document, options)
-        @parent = document
-        @klass = options.klass
-        @options = options
-        @foreign_key = options.foreign_key
-        extends(options)
-      end
     end
   end
 end

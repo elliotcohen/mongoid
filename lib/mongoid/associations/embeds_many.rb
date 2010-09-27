@@ -46,19 +46,6 @@ module Mongoid #:nodoc:
         end
       end
 
-      # Returns a count of the number of documents in the association that have
-      # actually been persisted to the database.
-      #
-      # Use #size if you want the total number of documents.
-      #
-      # Returns:
-      #
-      # The total number of persisted embedded docs, as flagged by the
-      # #persisted? method.
-      def count
-        @target.select(&:persisted?).size
-      end
-
       # Creates a new Document and adds it to the association collection. The
       # document created will be of the same class as the others in the
       # association, and the attributes will be passed into the constructor and
@@ -68,7 +55,8 @@ module Mongoid #:nodoc:
       #
       # The newly created Document.
       def create(attrs = {}, type = nil)
-        build(attrs, type).tap(&:save)
+        document = build(attrs, type)
+        document.save; document
       end
 
       # Creates a new Document and adds it to the association collection. The
@@ -82,7 +70,8 @@ module Mongoid #:nodoc:
       # The newly created Document.
       def create!(attrs = {}, type = nil)
         document = create(attrs, type)
-        raise Errors::Validations.new(document) unless document.errors.empty?
+        errors = document.errors
+        raise Errors::Validations.new(errors) unless errors.empty?
         document
       end
 
@@ -174,18 +163,9 @@ module Mongoid #:nodoc:
       # Returns:
       #
       # The newly build target Document.
-      def nested_build(attributes, options = {})
-        attributes.each do |index, attrs|
-          if document = detect { |document| document._index == index.to_i }
-            if options && options[:allow_destroy] && attrs['_destroy']
-              @target.delete(document)
-              document.destroy
-            else
-              document.write_attributes(attrs)
-            end
-          else
-            build(attrs)
-          end
+      def nested_build(attributes)
+        attributes.values.each do |attrs|
+          build(attrs)
         end
       end
 

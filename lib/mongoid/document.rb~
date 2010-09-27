@@ -311,3 +311,22 @@ module Mongoid #:nodoc:
 end
 
 
+module Mongoid::Document::Extensions 
+  module InstanceMethods 
+    def logger 
+      self.class.logger 
+    end 
+  end 
+  module ClassMethods 
+    def column_names 
+      self.fields.keys 
+    end 
+    def logger 
+      Rails.logger 
+    end 
+  end 
+end 
+Mongoid::Document::ClassMethods.send :include, 
+Mongoid::Document::Extensions::ClassMethods 
+Mongoid::Document::InstanceMethods.send :include, 
+Mongoid::Document::Extensions::InstanceMethods 

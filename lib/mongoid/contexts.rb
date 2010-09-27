@@ -20,5 +20,6 @@ module Mongoid
       end
       Contexts::Mongo.new(criteria)
     end
+
   end
 end

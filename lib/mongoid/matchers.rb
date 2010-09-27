@@ -18,7 +18,8 @@ module Mongoid #:nodoc:
     def matches?(selector)
       selector.each_pair do |key, value|
         return false unless matcher(key, value).matches?(value)
-      end; true
+      end
+      true
     end
 
     protected

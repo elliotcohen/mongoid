@@ -22,15 +22,18 @@ module Mongoid #:nodoc:
       #
       # The +Document+, whether the insert succeeded or not.
       def persist
-        return @document if @validate && @document.invalid?(:create)
-        @document.run_callbacks(:create) do
-          @document.run_callbacks(:save) do
-            if insert
-              @document.new_record = false
-              @document.move_changes
-            end
-          end
-        end; @document
+        return @document if @validate && !@document.valid?
+        @document.run_callbacks(:before_create)
+        @document.run_callbacks(:before_save)
+        if insert
+          @document.new_record = false
+          # TODO: All child document new_record flags must get set to false
+          # here or somewhere - this will cause problems.
+          @document.move_changes
+          @document.run_callbacks(:after_create)
+          @document.run_callbacks(:after_save)
+        end
+        @document
       end
 
       protected

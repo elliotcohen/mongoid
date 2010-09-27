@@ -11,8 +11,7 @@ module Mongoid #:nodoc
       :parameterize_keys,
       :persist_in_safe_mode,
       :raise_not_found_error,
-      :use_object_ids,
-      :skip_version_check
+      :use_object_ids
 
     # Defaults the configuration options to true.
     def initialize
@@ -90,7 +89,6 @@ module Mongoid #:nodoc
     #
     # The slaves DB instances.
     def slaves=(dbs)
-      return unless dbs
       dbs.each do |db|
         check_database!(db)
       end
@@ -110,26 +108,7 @@ module Mongoid #:nodoc
       @slaves
     end
 
-    # Return field names that could cause destructive things to happen if
-    # defined in a Mongoid::Document
-    #
-    # Example:
-    #
-    # <tt>Config.destructive_fields</tt>
-    #
-    # Returns:
-    #
-    # An array of bad field names.
-    def destructive_fields
-      @destructive_fields ||= lambda {
-        klass = Class.new do
-          include Mongoid::Document
-        end
-        klass.instance_methods(true).collect { |method| method.to_s }
-      }.call
-    end
-
-    # Configure mongoid from a hash that was usually parsed out of yml.
+    # Confiure mongoid from a hash that was usually parsed out of yml.
     #
     # Example:
     #
@@ -154,7 +133,6 @@ module Mongoid #:nodoc
       @raise_not_found_error = true
       @reconnect_time = 3
       @use_object_ids = false
-      @skip_version_check = false
       @time_zone = nil
     end
 
@@ -167,10 +145,8 @@ module Mongoid #:nodoc
     # <tt>config.check_database!</tt>
     def check_database!(database)
       raise Errors::InvalidDatabase.new(database) unless database.kind_of?(Mongo::DB)
-      unless Mongoid.skip_version_check
-        version = database.connection.server_version
-        raise Errors::UnsupportedVersion.new(version) if version < Mongoid::MONGODB_VERSION
-      end
+      version = database.connection.server_version
+      raise Errors::UnsupportedVersion.new(version) if version < Mongoid::MONGODB_VERSION
     end
 
     # Get a Rails logger or stdout logger.
@@ -188,21 +164,10 @@ module Mongoid #:nodoc
     #
     # <tt>config._master({}, "test")</tt>
     def _master(settings)
-      mongo_uri = settings["uri"].present? ? URI.parse(settings["uri"]) : OpenStruct.new
-
-      name = settings["database"] || mongo_uri.path.to_s.sub("/", "")
-      host = settings["host"] || mongo_uri.host || "localhost"
-      port = settings["port"] || mongo_uri.port || 27017
-      pool_size = settings["pool_size"] || 1 
-      username = settings["username"] || mongo_uri.user
-      password = settings["password"] || mongo_uri.password
-
-      connection = Mongo::Connection.new(host, port, :logger => logger, :pool_size => pool_size)
-      if username || password
-        connection.add_auth(name, username, password)
-        connection.apply_saved_authentication
-      end
-      self.master = connection.db(name)
+      name = settings["database"]
+      host = settings.delete("host") || "localhost"
+      port = settings.delete("port") || 27017
+      self.master = Mongo::Connection.new(host, port, :logger => logger).db(name)
     end
 
     # Get a bunch-o-slaves from settings and names.
@@ -211,26 +176,15 @@ module Mongoid #:nodoc
     #
     # <tt>config._slaves({}, "test")</tt>
     def _slaves(settings)
-      mongo_uri = settings["uri"].present? ? URI.parse(settings["uri"]) : OpenStruct.new
-      name = settings["database"] || mongo_uri.path.to_s.sub("/", "")
+      name = settings["database"]
       self.slaves = []
-      slaves = settings["slaves"]
+      slaves = settings.delete("slaves")
       slaves.to_a.each do |slave|
-        slave_uri = slave["uri"].present? ? URI.parse(slave["uri"]) : OpenStruct.new
-        slave_username = slave["username"] || slave_uri.user
-        slave_password = slave["password"] || slave_uri.password
-
-        slave_connection = Mongo::Connection.new(
-          slave["host"] || slave_uri.host || "localhost",
-          slave["port"] || slave_uri.port,
+        self.slaves << Mongo::Connection.new(
+          slave["host"],
+          slave["port"],
           :slave_ok => true
-        )
-
-        if slave_username || slave_password
-          slave_connection.add_auth(name, slave_username, slave_password)
-          slave_connection.apply_saved_authentication
-        end
-        self.slaves << slave_connection.db(name)
+        ).db(name)
       end
     end
   end

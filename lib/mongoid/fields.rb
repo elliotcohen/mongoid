@@ -1,14 +1,17 @@
 # encoding: utf-8
 module Mongoid #:nodoc
   module Fields #:nodoc
-    extend ActiveSupport::Concern
-    included do
-      # Set up the class attributes that must be available to all subclasses.
-      # These include defaults, fields
-      class_inheritable_accessor :fields
+    def self.included(base)
+      base.class_eval do
+        extend ClassMethods
+        # Set up the class attributes that must be available to all subclasses.
+        # These include defaults, fields
+        class_inheritable_accessor :fields
 
-      self.fields = {}
-      delegate :defaults, :fields, :to => "self.class"
+        self.fields = {}
+
+        delegate :defaults, :fields, :to => "self.class"
+      end
     end
 
     module ClassMethods #:nodoc
@@ -56,6 +59,7 @@ module Mongoid #:nodoc
           (options[:type] == Boolean) ? attr == true : attr.present?
         end
       end
+
     end
   end
 end

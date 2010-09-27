@@ -54,7 +54,11 @@ module Mongoid #:nodoc:
       protected
       # Update the document in the database atomically.
       def update
+pp "Updating Document: " + @document.id.to_s
         if @document.changed?
+pp "Document has changed, updating..."
+pp "Setters: "
+pp @document.setters        
           @collection.update(@document._selector, { "$set" => @document.setters }, @options.merge(:multi => false))
         end; true
       end

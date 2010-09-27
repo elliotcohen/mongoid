@@ -40,6 +40,7 @@ module Mongoid #:nodoc:
       # put into the document's attributes.
       def process(attrs = nil)
         (attrs || {}).each_pair do |key, value|
+pp "Attr: " + key.to_s + ", set_allowed?: " + set_allowed?(key).to_s + ", write_allowed?: " + write_allowed?(key).to_s        
           if set_allowed?(key)
             @attributes[key.to_s] = value
           elsif write_allowed?(key)

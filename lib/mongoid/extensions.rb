@@ -5,7 +5,6 @@ require "mongoid/extensions/array/aliasing"
 require "mongoid/extensions/array/assimilation"
 require "mongoid/extensions/array/conversions"
 require "mongoid/extensions/array/parentization"
-require "mongoid/extensions/set/conversions"
 require "mongoid/extensions/big_decimal/conversions"
 require "mongoid/extensions/binary/conversions"
 require "mongoid/extensions/boolean/conversions"
@@ -31,10 +30,6 @@ class Array #:nodoc
   include Mongoid::Extensions::Array::Assimilation
   include Mongoid::Extensions::Array::Conversions
   include Mongoid::Extensions::Array::Parentization
-end
-
-class Set #:nodoc
-  include Mongoid::Extensions::Set::Conversions
 end
 
 class BigDecimal #:nodoc
