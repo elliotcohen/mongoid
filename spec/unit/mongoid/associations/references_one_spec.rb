@@ -47,7 +47,7 @@ describe Mongoid::Associations::ReferencesOne do
       Game.expects(:first).returns(nil)
       Mongoid::Persistence::Insert.expects(:new).returns(@insert)
       @insert.expects(:persist).returns(Person.new)
-      @association = Mongoid::Associations::ReferencesOne.new(@parent, options)
+      @association = Mongoid::Associations::HasOneRelated.new(@parent, options)
     end
 
     it "adds a new object to the association" do

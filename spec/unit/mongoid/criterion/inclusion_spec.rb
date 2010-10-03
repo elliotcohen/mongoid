@@ -118,6 +118,15 @@ describe Mongoid::Criterion::Inclusion do
     end
   end
 
+  describe "#near" do
+
+    it "adds the $near modifier to the selector" do
+      @criteria.near(:field => [ 72, -44 ])
+      @criteria.selector.should ==
+        { :field => { "$near" => [ 72, -44 ] } }
+    end
+  end
+
   describe "#where" do
 
     context "when provided a hash" do

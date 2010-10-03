@@ -6,7 +6,7 @@ end
 
 def spec(file)
   if File.exists?(file)
-    run("rspec #{file}")
+    run("spec -b -O spec/spec.opts #{file}")
   else
     puts("Spec: #{file} does not exist.")
   end

@@ -214,9 +214,7 @@ describe Mongoid::Associations::EmbedsMany do
           @document,
           Mongoid::Associations::Options.new(:name => :addresses)
         )
-        @errors  = mock(:full_messages => ["test"], :empty? => false)
-        @address = mock(:parentize => true, :write_attributes => true, :_index= => true)
-        @address.expects(:errors).twice.returns(@errors)
+        @address = mock(:parentize => true, :write_attributes => true, :errors => [ "test" ], :_index= => true)
         Address.expects(:instantiate).returns(@address)
       end
 

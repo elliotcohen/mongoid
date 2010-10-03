@@ -19,25 +19,23 @@ describe Mongoid::Config do
     end
   end
 
-  describe "#destructive_fields" do
-
-    it "returns an array of bad field names" do
-      config.destructive_fields.should include("collection")
-    end
-  end
-
   describe "#from_hash" do
     context "regular mongoid.yml" do
       before do
         file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid.yml")
-        @settings = YAML.load(ERB.new(File.new(file_name).read).result)
-        config.from_hash(@settings["test"])
+        file = File.new(file_name)
+        @settings = YAML.load(file.read)["test"]
+        config.from_hash(@settings)
       end
 
       after { config.reset }
 
       it "sets the master db" do
         config.master.name.should == "mongoid_config_test"
+      end
+
+      it "sets use_object_ids" do
+          config.use_object_ids.should == true
       end
 
       it "sets allow_dynamic_fields" do
@@ -83,7 +81,6 @@ describe Mongoid::Config do
         config.use_utc.should be_true
       end
     end
-
   end
 
   describe "#master=" do

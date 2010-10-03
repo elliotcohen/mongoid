@@ -126,14 +126,6 @@ describe Mongoid::Associations::ReferencesMany do
       @association.build(:title => "Sassy")
       @association.first.person.should == @parent
     end
-
-    context "when passing nil" do
-
-      it "builds an object with empty attributes" do
-        @association.build(nil)
-        @association.first.person.should == @parent
-      end
-    end
   end
 
   describe "#delete_all" do
@@ -143,7 +135,7 @@ describe Mongoid::Associations::ReferencesMany do
       @parent = stub(:id => "5", :class => Person, :new_record? => true)
       Post.expects(:all).twice.returns(@criteria)
       @parent.expects(:reset).with("posts").yields
-      @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
+      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
     end
 
     it "deletes all of the associated object" do
@@ -159,7 +151,7 @@ describe Mongoid::Associations::ReferencesMany do
       @parent = stub(:id => "5", :class => Person, :new_record? => true)
       Post.expects(:all).twice.returns(@criteria)
       @parent.expects(:reset).with("posts").yields
-      @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
+      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
     end
 
     it "destroys all of the associated objects" do
@@ -255,7 +247,7 @@ describe Mongoid::Associations::ReferencesMany do
       @post = mock
       @parent = stub(:id => "5", :class => Person, :new_record? => true)
       Post.expects(:all).returns([])
-      @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
+      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
       Post.expects(:instantiate).returns(@post)
     end
 

@@ -20,11 +20,5 @@ describe Mongoid::Timestamps do
       @person.created_at.should be_close(Time.now.utc, 10.seconds)
       @person.updated_at.should be_close(Time.now.utc, 10.seconds)
     end
-    
-    it "includes a record_timestamps class_accessor to ease AR compatibility" do
-      Person.should.respond_to? :record_timestamps
-    end
-
   end
-
 end

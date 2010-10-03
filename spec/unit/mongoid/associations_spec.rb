@@ -521,8 +521,8 @@ describe Mongoid::Associations do
       end
 
       it "sets the foreign key as an object id" do
-        Game.expects(:field).with("person_id", :type => BSON::ObjectID)
-        Game.referenced_in :person
+        Game.expects(:field).with("person_id", :type => BSON::ObjectId)
+        Game.belongs_to_related :person
       end
     end
 

@@ -73,17 +73,12 @@ describe Mongoid::Errors do
       context "default" do
 
         before do
-          @errors = stub(:full_messages => [ "Error 1", "Error 2" ], :empty? => false)
-          @document = stub(:errors => @errors)
-          @error = Mongoid::Errors::Validations.new(@document)
+          @errors = stub(:full_messages => [ "Error 1" , "Error 2" ])
+          @error = Mongoid::Errors::Validations.new(@errors)
         end
 
         it "contains the errors' full messages" do
           @error.message.should == "Validation Failed: Error 1, Error 2"
-        end
-
-        it "allows access to the invalid document" do
-          @error.document.should == @document
         end
       end
     end
@@ -119,20 +114,6 @@ describe Mongoid::Errors do
 
         it "contains class is not allowed" do
           @error.message.should include("field named 'collection' is not allowed")
-        end
-      end
-    end
-  end
-
-  describe Mongoid::Errors::TooManyNestedAttributeRecords do
-    describe "#message" do
-      context "default" do
-        before do
-          @error = Mongoid::Errors::TooManyNestedAttributeRecords.new('Favorites', 5)
-        end
-
-        it "contains error message" do
-          @error.message.should include("Accept Nested Attributes for Favorites is limited to 5 records")
         end
       end
     end

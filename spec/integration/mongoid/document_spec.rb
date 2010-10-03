@@ -399,7 +399,7 @@ describe Mongoid::Document do
 
     context "with relational associations" do
 
-      context "for a references_one" do
+      context "for a has_one_related" do
 
         before do
           @game = @person.game.create(:score => 50)
@@ -413,7 +413,7 @@ describe Mongoid::Document do
         end
       end
 
-      context "for a referenced_in" do
+      context "for a belongs_to_related" do
 
         before do
           @game = @person.game.create(:score => 50)
@@ -644,6 +644,63 @@ describe Mongoid::Document do
         @person.save
         from_db = Person.find(@person.id)
         from_db.encode_json(@encoder).should include('"pets":false')
+      end
+
+    end
+
+  end
+
+  describe "#as_json" do
+
+    before do
+      @person = Person.new(:title => "Sir", :age => 30)
+      @address = Address.new(:street => "Nan Jing Dong Lu")
+      @person.addresses << @address
+    end
+
+    context "on a new document" do
+
+      it "returns the attributes" do
+        @person.as_json.should == @person.attributes
+      end
+
+    end
+
+    context "on a persisted document" do
+
+      it "returns the attributes" do
+        @person.save
+        from_db = Person.find(@person.id)
+        from_db.as_json.should == from_db.attributes
+      end
+
+    end
+
+  end
+
+  describe "#encode_json" do
+
+    before do
+      @person = Person.new(:title => "Sir", :age => 30)
+      @address = Address.new(:street => "Nan Jing Dong Lu")
+      @person.addresses << @address
+      @encoder = Array.new
+    end
+
+    context "on a new document" do
+
+      it "returns the attributes" do
+        @person.encode_json(@encoder).should == @person.attributes
+      end
+
+    end
+
+    context "on a persisted document" do
+
+      it "returns the attributes" do
+        @person.save
+        from_db = Person.find(@person.id)
+        from_db.encode_json(@encoder).should == from_db.attributes
       end
 
     end

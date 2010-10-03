@@ -11,7 +11,7 @@ describe Mongoid::Identity do
       let(:canvas) { Canvas.new }
 
       it "sets the document _type to the class name" do
-        Mongoid::Identity.new(canvas).create
+        Mongoid::Identity.create(canvas)
         canvas._type.should == "Canvas"
       end
 
@@ -22,7 +22,7 @@ describe Mongoid::Identity do
       let(:browser) { Browser.new }
 
       it "sets the document _type to the class name" do
-        Mongoid::Identity.new(browser).create
+        Mongoid::Identity.create(browser)
         browser._type.should == "Browser"
       end
 
@@ -58,7 +58,7 @@ describe Mongoid::Identity do
           @person = Person.allocate
           @person.instance_variable_set(:@attributes, {})
           @object_id = stub(:to_s => "1")
-          BSON::ObjectID.expects(:new).returns(@object_id)
+          BSON::ObjectId.expects(:new).returns(@object_id)
         end
 
         context "when using object ids" do

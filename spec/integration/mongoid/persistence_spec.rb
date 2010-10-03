@@ -17,6 +17,7 @@ describe Mongoid::Persistence do
       person.should be_a_kind_of(Person)
       person.should_not be_a_new_record
     end
+
   end
 
   describe ".create!" do
@@ -33,8 +34,11 @@ describe Mongoid::Persistence do
           Person.create!(:ssn => "555-55-9999")
           lambda { Person.create!(:ssn => "555-55-9999") }.should raise_error
         end
+
       end
+
     end
+
   end
 
   describe "#delete" do
@@ -53,6 +57,7 @@ describe Mongoid::Persistence do
       it "returns true" do
         @person.delete.should be_true
       end
+
     end
 
     context "deleting an embedded document" do
@@ -69,6 +74,7 @@ describe Mongoid::Persistence do
           @person.addresses.should be_empty
           @person.attributes[:addresses].should be_empty
         end
+
       end
 
       context "when the document has been saved" do
@@ -82,8 +88,11 @@ describe Mongoid::Persistence do
           from_db = Person.find(@person.id)
           from_db.addresses.should be_empty
         end
+
       end
+
     end
+
   end
 
   describe "#destroy" do
@@ -102,6 +111,7 @@ describe Mongoid::Persistence do
       it "returns true" do
         @person.destroy.should be_true
       end
+
     end
 
     context "deleting an embedded document" do
@@ -118,6 +128,7 @@ describe Mongoid::Persistence do
           @person.addresses.should be_empty
           @person.attributes[:addresses].should be_empty
         end
+
       end
 
       context "when the document has been saved" do
@@ -166,78 +177,9 @@ describe Mongoid::Persistence do
       it "returns true" do
         @person.save.should be_true
       end
+
     end
 
-    context "when validation fails" do
-
-      before do
-        @address = @person.addresses.create(:city => "London")
-      end
-
-      it "returns false" do
-        @address.save.should == false
-      end
-
-      it "has the appropriate errors" do
-        @address.save
-        @address.errors[:street].should == ["can't be blank"]
-      end
-    end
-
-    context "when modifying the entire hierarchy" do
-
-      context "when performing modification and insert ops" do
-
-        before do
-          @person = Person.create(:title => "Blah", :ssn => "244-01-1112")
-          @person.title = "King"
-          @address = @person.addresses.build(:street => "Bond St")
-          @person.create_name(:first_name => "Tony")
-          @person.name.first_name = "Ryan"
-        end
-
-        it "saves the hierarchy" do
-          @person.save
-          @person.reload
-          @person.title.should == "King"
-          @person.name.first_name.should == "Ryan"
-          @person.addresses.first.street.should == "Bond St"
-        end
-
-        it "persists with proper set and push modifiers" do
-          @person._updates.should == {
-            "$set" => { "title" => "King", "name.first_name" => "Ryan" },
-            "$push"=> { "addresses" => { "_id" => @address.id, "street"=>"Bond St" }}
-          }
-          @person.save
-          @person._updates.should == {}
-        end
-
-      end
-
-      context "when removing elements without using delete or destroy" do
-
-        before do
-          @person = Person.create(:title => "Blah", :ssn => "244-01-1112")
-          @person.create_name(:first_name => "Tony")
-          @person.name = nil
-        end
-
-        it "saves the hierarchy" do
-          @person.save
-          @person.reload
-          @person.name.should be_nil
-        end
-
-        it "persists with proper unset and pull modifiers" do
-          @person._updates.should == {
-            "$set" => { "name" => nil }
-          }
-          @person.save
-          @person._updates.should == {}
-        end
-      end
-    end
   end
 
   describe "save!" do
@@ -251,8 +193,11 @@ describe Mongoid::Persistence do
           person = Person.new(:ssn => "555-55-9999")
           lambda { person.save!(:ssn => "555-55-9999") }.should raise_error
         end
+
       end
+
     end
+
   end
 
   describe "#update_attributes" do

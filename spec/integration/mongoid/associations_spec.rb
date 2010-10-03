@@ -160,7 +160,6 @@ describe Mongoid::Associations do
         @account.creator.should == @user
       end
     end
-
   end
 
   context "one-to-many relational associations" do
@@ -527,7 +526,6 @@ describe Mongoid::Associations do
             @fourth = Address.new(:street => "Bar")
             @from_db.addresses << @third
             @from_db.addresses << @fourth
-            @from_db.save!
           end
 
           it "does not change the internal order of the array" do
@@ -610,16 +608,35 @@ describe Mongoid::Associations do
           @person = Person.new(:title => "Sir", :ssn => "1")
           @name = Name.new(:first_name => "Syd")
           @person.name = @name
-          @person.save
         end
 
-        it "persists all the associations properly" do
-          from_db = Person.find(@person.id)
-          translation = Translation.new(:language => "fr")
-          from_db.name.translations << translation
-          from_db.attributes[:name][:translations].should_not be_nil
+        context "when saving from root" do
+
+          before do
+            @person.save
+          end
+
+          it "persists all the associations properly" do
+            from_db = Person.find(@person.id)
+            translation = Translation.new(:language => "fr")
+            from_db.name.translations << translation
+            from_db.attributes[:name][:translations].should_not be_nil
+          end
         end
 
+        context "when saving from children" do
+
+          before do
+            @translation = Translation.new(:language => "fr")
+            @name.translations << @translation
+            @translation.save!
+          end
+
+          it "persists the entire graph" do
+            from_db = Person.find(@person.id)
+            from_db.name.translations.first.should == @translation
+          end
+        end
       end
 
       context "when a has-many to has-many" do
@@ -636,107 +653,6 @@ describe Mongoid::Associations do
           @person.save
           @person.addresses.first.locations.first.should == location
         end
-      end
-    end
-  end
-
-  context "references many as array" do
-
-    context "with a saved parent" do
-
-      before do
-        @person = Person.create!(:ssn => "992-33-1010")
-      end
-
-      context "appending a new document" do
-
-        before do
-          @preference = Preference.new(:name => "test")
-          @person.preferences << @preference
-        end
-
-        it "adds the document to the array" do
-          @person.preferences.first.should == @preference
-        end
-
-        it "adds the parent document to the reverse association" do
-          @preference.people.first.should == @person
-        end
-      end
-
-      context "building a document" do
-
-        before do
-          @preference = @person.preferences.build(:name => "test")
-        end
-
-        it "adds the document to the array" do
-          @person.preferences.first.should == @preference
-        end
-
-        it "adds the parent document to the reverse association" do
-          @preference.people.first.should == @person
-        end
-      end
-
-      context "creating a document" do
-
-        before do
-          @preference = @person.preferences.create(:name => "test")
-        end
-
-        it "adds the document to the array" do
-          @person.preferences.first.should == @preference
-        end
-
-        it "adds the parent document to the reverse association" do
-          @preference.people.first.should == @person
-        end
-      end
-    end
-
-    context "with a new parent" do
-
-      let(:person) do
-        Person.new(:ssn => "992-33-1010")
-      end
-
-      context "appending a new document" do
-
-        before do
-          @preference = Preference.new(:name => "test")
-          person.preferences << @preference
-        end
-
-        it "adds the document to the array" do
-          person.preferences.first.should == @preference
-        end
-      end
-
-      context "building a document" do
-
-        before do
-          @preference = person.preferences.build(:name => "test")
-        end
-
-        it "adds the document to the array" do
-          person.preferences.first.should == @preference
-        end
-
-        it "adds the parent document to the reverse association"
-      end
-
-      context "creating a document" do
-
-        before do
-          @preference = person.preferences.create(:name => "test")
-        end
-
-        it "adds the document to the array" do
-          person.preferences.first.should == @preference
-        end
-
-        it "adds the parent document to the reverse association"
       end
     end
   end
